@@ -2,6 +2,7 @@
 /*   Copyright (C) sanpontze. All Rights Reserved                            */
 
 #include          <stdio.h>
+#include          <stdlib.h>
 #include          <string.h>
 #include          <stdarg.h>
 #include          <libcob.h>
@@ -43,7 +44,7 @@ int SQLite3_Open(sqlite3 **db, ...)
            func = cob_resolve(fname);
            if(func == NULL){
               fprintf(stderr, "%s\n", cob_resolve_error());
-              exit(1);
+              (void)exit(1);
            }
            errout = 3;                           // user function
     }

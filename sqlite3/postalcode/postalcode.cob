@@ -1,7 +1,15 @@
         identification           division.
-        program-id.               postal_code.
+        program-id.              postal_code.
         data                     division.
         working-storage           section.
+        78  black                       value 0.
+        78  blue                        value 1.
+        78  green                       value 2.
+        78  cyan                        value 3.
+        78  red                         value 4.
+        78  magenta                     value 5.
+        78  yellow                      value 6.
+        78  white                       value 7.
         01  POSTAL_CODE.
             03 dantai           pic x(4).
             03 zip_5            pic X(05).
@@ -41,7 +49,68 @@
         01  rc               pic    9(02).
         01  err-msg          pic    x(60).
         01  flag             pic    x(01).
-        procedure                division.
+        01  i               pic 99.
+        01  argc            pic 9(04).
+        01  STD.
+            03 default_arg_num pic 99 values 10.
+        01  params.
+            03 param  occurs 10  pic X(50).
+        01  SLEEP-CALL.
+            03 sleep_cmd  pic x(6) values "sleep ".
+            03 sleep_time pic 9(2) values 5.
+        01  SCREEN_ITEM.
+            03 search-screen-items.
+               05 i_yubin pic N(10) values N"郵便番号:".
+        SCREEN section.
+        01 search-screen.
+            03 values N"郵便番号:" LINE 1  COL 10.
+            03 a_15    LINE 1  COL 30 pic X(20) using zip_7.
+            03 values N"都道府県:" LINE 2  COL 10.
+            03 a_16    LINE 2  COL 30 pic X(20) using ken.
+       *    03 filler line 15 column 10 values "郵便番号:".
+       *    03 a_15  pic x(20) line 16 column 30 HIGHLIGHT.
+       *    03 filler line 16 column 10 values N"都道府県".
+       *    03 a_16  pic x(20) line 16 column 30 HIGHLIGHT.
+
+        01 blank-screen.
+           05 filler line 1 blank screen background-color black.
+
+        procedure               division.
+       *コマンドパラメータ数
+          accept argc from argument-number.
+          display "argc = " argc.
+          if argc > 0 and argc < default_arg_num then
+       *********************************************
+       *コマンドパラメータ取得
+             move 1 to i
+             perform until argc < i
+               accept param(i) from argument-value
+               display "param(" i ")=" param(i)
+               compute i = i + 1
+             end-perform
+       *********************************************
+          else
+       *********************************************
+             display "Error: argc=" argc " (<" default_arg_num")"
+             stop run
+       *********************************************
+          end-if.
+
+
+        SLEEP-S.
+          DISPLAY SLEEP-CALL
+          call "system" using SLEEP-CALL.
+        SLEEP-E.
+
+       .screen-loop.
+          display search-screen.
+          accept search-screen.
+          if a_15(1:1) not equal "q"
+             perform SLEEP-S THRU SLEEP-E
+             go to screen-loop
+          end-if.
+
+
 
        * DB connection
            call  "SQLite3_Open"  using db "yubin.db"
@@ -89,4 +158,3 @@
            move return-code to rc
            display "rc=" rc ":" err-msg
            stop run.
-           

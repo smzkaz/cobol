@@ -19,9 +19,17 @@ yubin.csv : KEN_ALL.CSV
 	nkf -w -Lu KEN_ALL.CSV > yubin.csv
 
 clean :
-	-rm yubin.csv
-	-rm yubin.db
-	-rm postalcode.exe
-	-rm postalcode
+	@if test -f yubin.csv; then \
+	    rm yubin.csv ; \
+	 fi
+	@if test -f yubin.db; then \
+	    rm yubin.db ; \
+	 fi
+	@if test -f postalcode.exe ; then \
+	    rm postalcode.exe ; \
+	 fi
+	@if test -f postalcode; then \
+	    rm postalcode ; \
+	 fi
 
 
