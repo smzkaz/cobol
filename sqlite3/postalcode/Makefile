@@ -1,7 +1,6 @@
-
 SRC = postalcode.cob cob-sqlite3.c
 
-CC = /usr/local/bin/cobc
+CC = cobc
 # CFLAGS_DEBUG= -fdebugging-line
 CFLAGS = -x $(CFLAGS_DEBUG)
 
@@ -23,5 +22,6 @@ clean :
 	-rm yubin.csv
 	-rm yubin.db
 	-rm postalcode.exe
+	-rm postalcode
 
 
