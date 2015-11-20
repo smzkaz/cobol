@@ -1,7 +1,7 @@
 SRC = postalcode.cob cob-sqlite3.c
 
 CC = cobc
-# CFLAGS_DEBUG= -fdebugging-line
+CFLAGS_DEBUG= -fdebugging-line -ftraceall
 CFLAGS = -x $(CFLAGS_DEBUG)
 
 LFLAGS = -lsqlite3 

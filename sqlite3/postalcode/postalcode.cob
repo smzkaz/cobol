@@ -57,71 +57,84 @@
             03 param  occurs 10  pic X(50).
         01  SLEEP-CALL.
             03 sleep_cmd  pic x(6) values "sleep ".
-            03 sleep_time pic 9(2) values 5.
+            03 sleep_time pic 9(1) values 2.
         01  SCREEN_ITEM.
             03 search-screen-items.
                05 i_yubin pic N(10) values N"郵便番号:".
         SCREEN section.
         01 search-screen.
+      **    03 values N"郵便番号:" LINE 1  COL 10.
+      **    03 a_15    LINE 1  COL 30 pic X(20) using zip_7.
             03 values N"郵便番号:" LINE 1  COL 10.
-            03 a_15    LINE 1  COL 30 pic X(20) using zip_7.
-            03 values N"都道府県:" LINE 2  COL 10.
-            03 a_16    LINE 2  COL 30 pic X(20) using ken.
-       *    03 filler line 15 column 10 values "郵便番号:".
-       *    03 a_15  pic x(20) line 16 column 30 HIGHLIGHT.
-       *    03 filler line 16 column 10 values N"都道府県".
-       *    03 a_16  pic x(20) line 16 column 30 HIGHLIGHT.
+            03 a_15    LINE 1  COL 30 pic X(7) using zip_7.
+      * *    03 filler line 15 column 10 values "郵便番号:".
+      * *    03 a_15  pic x(20) line 16 column 30 HIGHLIGHT.
+      * *    03 filler line 16 column 10 values N"都道府県".
+      * *    03 a_16  pic x(20) line 16 column 30 HIGHLIGHT.
 
         01 blank-screen.
            05 filler line 1 blank screen background-color black.
+           05 ERASE EOS.
 
+        01 result-screen.
+           03 values N"郵便番号(7桁) :" line 1 col 10.
+           03 values N"都道府県名    :" line 2 col 10.
+           03 values N"市区町村名    :" line 3 col 10.
+           03 values N"町域名        :" line 4 col 10.
+      *    03 zip_7                     line 1 col 30.
+      *    03 ken                       line 2 col 30.
+      *    03 shi                       line 3 col 30.
+      *    03 cho                       line 4 col 30.
+           
         procedure               division.
        *コマンドパラメータ数
           accept argc from argument-number.
           display "argc = " argc.
-          if argc > 0 and argc < default_arg_num then
-       *********************************************
-       *コマンドパラメータ取得
-             move 1 to i
-             perform until argc < i
-               accept param(i) from argument-value
-               display "param(" i ")=" param(i)
-               compute i = i + 1
-             end-perform
-       *********************************************
-          else
-       *********************************************
-             display "Error: argc=" argc " (<" default_arg_num")"
-             stop run
-       *********************************************
-          end-if.
-
+          if argc > 0 then  
+             if argc > 0 and argc < default_arg_num then
+      **********************************************
+      * *コマンドパラメータ取得
+                move 1 to i
+                perform until argc < i
+                accept param(i) from argument-value
+                display "param(" i ")=" param(i)
+                compute i = i + 1
+                end-perform
+      **********************************************
+             else
+      * *********************************************
+                display "Error: argc=" argc " (<" default_arg_num")"
+                stop run
+      ***********************************************
+             end-if
+         end-if.
 
         SLEEP-S.
-          DISPLAY SLEEP-CALL
-          call "system" using SLEEP-CALL.
+      D    DISPLAY SLEEP-CALL
+           call "system" using SLEEP-CALL.
         SLEEP-E.
 
        .screen-loop.
           display search-screen.
           accept search-screen.
-          if a_15(1:1) not equal "q"
-             perform SLEEP-S THRU SLEEP-E
-             go to screen-loop
+          display blank-screen.
+      D   display "1:a_15=" a_15.
+
+          if a_15(1:1) equal "q" then
+             display ">> Enter q <<"
+             stop run
           end-if.
+          display "2:a_15=" a_15.
 
-
-
-       * DB connection
+      *  DB connection
            call  "SQLite3_Open"  using db "yubin.db"
            if return-code not = 0  then
               perform  db-error
            end-if
 
-       * executing select
+      * executing select
            call  "SQLite3_Exec" using db
-                 "SELECT * FROM POSTAL_CODE where zip_7 = '1110023' "
-                       
+                 "SELECT * FROM POSTAL_CODE where zip_7 = '" a_15 "' "
            if return-code not = 0  then
               perform  db-error
            end-if
