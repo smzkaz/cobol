@@ -1,12 +1,15 @@
 SRC = postalcode.cob cob-sqlite3.c
 
 CC = cobc
-CFLAGS_DEBUG= -fdebugging-line -ftraceall
+CFLAGS_DEBUG= # -fdebugging-line  # -ftraceall
 CFLAGS = -x $(CFLAGS_DEBUG)
 
 LFLAGS = -lsqlite3 
 
-all : yubin.db postalcode.exe 
+all : yubin.db postalcode.exe mk_seq_postalcode_file.exe 
+
+mk_seq_postalcode_file.exe : mk_seq_postalcode_file.cob cob-sqlite3.c
+	$(CC) $(CFLAGS) $(LFLAGS) mk_seq_postalcode_file.cob cob-sqlite3.c 
 
 postalcode.exe : $(SRC)
 	$(CC) $(CFLAGS) $(SRC) $(LFLAGS)
